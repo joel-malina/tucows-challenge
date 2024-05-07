@@ -1,0 +1,36 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - govet
+    - stylecheck
+    - ginkgolinter
+    - tagliatelle
+
+issues:
+  exclude-rules:
+    - linters:
+        - govet
+      text: "shadow: declaration of \"(err|ctx)\" shadows declaration at line"
+
+linters-settings:
+  errcheck:
+    # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`.
+    check-blank: true
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+  gosimple:
+    # Disable https://staticcheck.dev/docs/checks/#S1002 and let verbose boolean comparisons stand
+    checks: ["all", "-S1002"]
+  tagliatelle:
+    # Check the struct tag name case.
+    case:
+      # `camel` is used for `json` and `yaml`, and `header` is used for `header` (can be overridden)
+      # Default: {}
+      rules:
+        # Any struct tag type can be used.
+        # Support string case: `camel`, `pascal`, `kebab`, `snake`, `goCamel`, `goPascal`, `goKebab`, `goSnake`, `upper`, `lower`, `header`
+        json: camel
