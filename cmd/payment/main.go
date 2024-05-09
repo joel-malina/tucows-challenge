@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/joel-malina/tucows-challenge/internal/payment/config"
-	"github.com/joel-malina/tucows-challenge/internal/payment/service"
+	"github.com/joel-malina/tucows-challenge/internal/payment-service/config"
+	"github.com/joel-malina/tucows-challenge/internal/payment-service/service"
 	"github.com/sirupsen/logrus"
 )
 

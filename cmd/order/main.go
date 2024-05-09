@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/joel-malina/tucows-challenge/internal/order/config"
-	"github.com/joel-malina/tucows-challenge/internal/order/service"
+	"github.com/joel-malina/tucows-challenge/internal/order-service/config"
+	"github.com/joel-malina/tucows-challenge/internal/order-service/service"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,5 +30,5 @@ func main() {
 		cancel()
 	}()
 
-	service.Run(ctx, cfg) //, &service.StorageResolver{})
+	service.Run(ctx, cfg, &service.StorageResolver{})
 }

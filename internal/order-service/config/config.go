@@ -11,9 +11,9 @@ type ServiceConfig struct {
 	ServiceBuildDate string
 
 	//ClusterBaseURL url.URL `env:"CLUSTER_BASE_URL" envDefault:"http://localhost:8080" envDocs:"The base url for the cluster running the service"`
-	BasePath    string `env:"BASE_PATH" envDefault:"/payment" envDocs:"The base path for the REST api"`
-	ServiceName string `env:"SERVICE_NAME" envDefault:"payment" envDocs:"The name of the service"`
-	Port        int    `env:"PORT" envDefault:"8081" envDocs:"The port which the service will listen to"`
+	BasePath    string `env:"BASE_PATH" envDefault:"/order-service" envDocs:"The base path for the REST api"`
+	ServiceName string `env:"SERVICE_NAME" envDefault:"order-service" envDocs:"The name of the service"`
+	Port        int    `env:"PORT" envDefault:"8080" envDocs:"The port which the service will listen to"`
 
 	LogLevel  string `env:"LOG_LEVEL" envDefault:"info" envDocs:"Determines what log level to output"`
 	LogFormat string `env:"LOG_FORMAT" envDefault:"text" envDocs:"Determines what log format to output"`
@@ -22,7 +22,7 @@ type ServiceConfig struct {
 
 	PostgresHost              string `env:"POSTGRES_HOST" envDefault:"localhost"`
 	PostgresPort              string `env:"POSTGRES_PORT" envDefault:"5432"`
-	PostgresDB                string `env:"POSTGRES_DB" envDefault:"service"`
+	PostgresDB                string `env:"POSTGRES_DB" envDefault:"order-service"`
 	PostgresUser              string `env:"POSTGRES_USERNAME" envDefault:"postgres"`
 	PostgresPassword          string `env:"POSTGRES_PASSWORD" envDefault:"example"`
 	PostgresSSLMode           string `env:"POSTGRES_SSL_MODE" envDefault:"disable"`
