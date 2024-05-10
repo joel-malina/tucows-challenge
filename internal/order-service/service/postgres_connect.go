@@ -26,5 +26,6 @@ func connectToPostgres(log *logrus.Logger, serviceConfig config.ServiceConfig) *
 
 	db.SetMaxIdleConns(serviceConfig.PostgresMaxIdleConnection)
 	db.SetMaxOpenConns(serviceConfig.PostgresMaxOpenConnection)
+
 	return db
 }

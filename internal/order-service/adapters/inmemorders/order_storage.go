@@ -68,7 +68,7 @@ func (db *OrderStorage) OrderGet(_ context.Context, id uuid.UUID) (model.Order, 
 	return order, nil
 }
 
-func (db *OrderStorage) OrderGetAll(_ context.Context) ([]model.Order, error) {
+func (db *OrderStorage) OrdersGet(_ context.Context) ([]model.Order, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 

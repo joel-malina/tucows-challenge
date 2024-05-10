@@ -20,7 +20,7 @@ type OrderCreator interface {
 
 type OrderGetter interface {
 	OrderGet(ctx context.Context, id uuid.UUID) (model.Order, error)
-	OrderGetAll(ctx context.Context) ([]model.Order, error)
+	OrdersGet(ctx context.Context) ([]model.Order, error)
 }
 
 type OrderUpdater interface {

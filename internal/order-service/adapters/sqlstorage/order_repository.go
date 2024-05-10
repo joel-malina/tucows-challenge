@@ -92,7 +92,7 @@ func (f OrderRepository) OrderGet(ctx context.Context, id uuid.UUID) (model.Orde
 	return orderModelFromRecord(record), nil
 }
 
-func (f OrderRepository) OrderGetAll(ctx context.Context) ([]model.Order, error) {
+func (f OrderRepository) OrdersGet(ctx context.Context) ([]model.Order, error) {
 	var orderRecords []orderRecord
 	err := f.db.SelectContext(ctx, &orderRecords, "SELECT id, product_name, quantity, price, status, created_at, created_at, last_update, deleted_at FROM order-service WHERE deleted_at IS NULL")
 	if err != nil {

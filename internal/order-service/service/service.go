@@ -10,8 +10,12 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/filters"
 
+	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"
+	"github.com/go-openapi/spec"
+	"github.com/joel-malina/tucows-challenge/internal/order-service/adapters/handler"
 	"github.com/joel-malina/tucows-challenge/internal/order-service/config"
+	"github.com/joel-malina/tucows-challenge/internal/order-service/order"
 	"github.com/sirupsen/logrus"
 )
 
@@ -66,12 +70,12 @@ func Run(ctx context.Context, serviceConfig config.ServiceConfig, storageResolve
 	log.Println("exiting")
 }
 
-// TODO: Make these routes/handlers
 type orderHandlers struct {
-	handler.orderCreator
-	handler.orderGetter
-	handler.orderUpdater
-	handler.orderDeleter
+	handler.OrderCreator
+	handler.OrderGetter
+	handler.OrdersGetter
+	handler.OrderUpdater
+	handler.OrderDeleter
 }
 
 func setupServiceDependencies(_ context.Context, log *logrus.Logger, serviceConfig config.ServiceConfig, storage *StorageResolver) orderHandlers {
@@ -81,10 +85,11 @@ func setupServiceDependencies(_ context.Context, log *logrus.Logger, serviceConf
 	orderRepo := storage.OrderRepository
 
 	orderHandlerLogic := orderHandlers{
-		orderCreator: orderRepo,
-		orderGetter:  orderRepo,
-		orderUpdater: orderRepo,
-		orderDeleter: orderRepo,
+		OrderCreator: order.NewOrderCreate(orderRepo),
+		OrderGetter:  order.NewOrderGet(orderRepo),
+		OrdersGetter: order.NewOrdersGet(orderRepo),
+		OrderUpdater: order.NewOrderUpdate(orderRepo),
+		OrderDeleter: order.NewOrderDelete(orderRepo),
 	}
 
 	return orderHandlerLogic
@@ -113,4 +118,69 @@ func setupWebServiceContainer(serviceConfig config.ServiceConfig, orderHandlerLo
 	setupAPIDocs(container, serviceConfig, container)
 
 	return container
+}
+
+func setupHealthCheck(container *restful.Container, serviceName string, basePath string, operation string) {
+	healthzPath := fmt.Sprintf("%s/healthz", basePath)
+	service := new(restful.WebService).Path(healthzPath)
+	service.Route(service.GET("/").
+		To(handler.BasicHealthCheck(serviceName)).
+		Doc("Health check").
+		Metadata(restfulspec.KeyOpenAPITags, orderServiceAPITag).
+		Operation("version").
+		Operation(operation).
+		Produces(restful.MIME_JSON))
+	container.Add(service)
+}
+
+func setupVersion(container *restful.Container, serviceConfig config.ServiceConfig) {
+	service := new(restful.WebService).Path(serviceConfig.BasePath)
+	service.Route(service.GET("/version").
+		To(handler.VersionInfo(serviceConfig)).
+		Doc("Version info").
+		Metadata(restfulspec.KeyOpenAPITags, orderServiceAPITag).
+		Produces(restful.MIME_JSON))
+	container.Add(service)
+}
+
+func setupV1Routes(container *restful.Container, serviceConfig config.ServiceConfig, orderHandlers orderHandlers) {
+	v1RootPath := fmt.Sprintf("%s/v1", serviceConfig.BasePath)
+	v1RootRoutes := new(restful.WebService).Path(v1RootPath)
+
+	// would add auth filter to these, possibly namespace them too
+	MakeOrderCreateRoute(v1RootRoutes, orderHandlers)
+	MakeOrderGetRoute(v1RootRoutes, orderHandlers)
+	MakeOrderGetAllRoute(v1RootRoutes, orderHandlers)
+	MakeOrderUpdateRoute(v1RootRoutes, orderHandlers)
+	MakeOrderDeleteRoute(v1RootRoutes, orderHandlers)
+
+	container.Add(v1RootRoutes)
+}
+
+func setupAPIDocs(container *restful.Container, serviceConfig config.ServiceConfig, serviceContainer *restful.Container) {
+	apiDocsPath := serviceConfig.BasePath + "/apidocs/"
+	swaggerConfig := restfulspec.Config{
+		WebServices: serviceContainer.RegisteredWebServices(),
+		APIPath:     apiDocsPath + "api.json",
+		PostBuildSwaggerObjectHandler: func(s *spec.Swagger) {
+			s.Info = &spec.Info{
+				InfoProps: spec.InfoProps{
+					Title:       serviceConfig.ServiceName,
+					Description: "A Service to manage orders",
+					Version:     serviceConfig.ServiceVersion,
+				},
+			}
+			s.SecurityDefinitions = map[string]*spec.SecurityScheme{
+				"authorization": spec.APIKeyAuth("Authorization", "header"),
+			}
+			s.Security = []map[string][]string{
+				{"authorization": {}},
+			}
+		},
+	}
+
+	prefix := http.StripPrefix(apiDocsPath, http.FileServer(http.Dir("swagger-ui")))
+	serviceContainer.Handle(apiDocsPath, prefix)
+
+	container.Add(restfulspec.NewOpenAPIService(swaggerConfig))
 }
