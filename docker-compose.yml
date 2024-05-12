@@ -1,4 +1,3 @@
-# Use postgres/example user/password credentials
 version: '3.1'
 
 services:
@@ -21,6 +20,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   atlas-migration:
     image: postgres:15.1
     restart: always
@@ -29,10 +29,10 @@ services:
       POSTGRES_USER: user1
       POSTGRES_PASSWORD: pw1
     ports:
-      #  using a non-default port so as not to clash with other services running postgres locally
       - "5433:5432"
     networks:
       - db
+
   sandbox_creator:
     image: accelbyte/pg-sandbox-creator:8ff4a4a6-1698105179
     depends_on:
@@ -49,7 +49,25 @@ services:
       - "8081:8081"
     networks:
       - db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5672:5672"    # Default RabbitMQ port
+      - "15672:15672"  # Management interface
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - db
+    restart: always
+
 networks:
   db:
+
 volumes:
   postgres-vol:
+  rabbitmq-data:

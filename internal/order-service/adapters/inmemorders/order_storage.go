@@ -68,17 +68,17 @@ func (db *OrderStorage) OrderGet(_ context.Context, id uuid.UUID) (model.Order, 
 	return order, nil
 }
 
-func (db *OrderStorage) OrdersGet(_ context.Context) ([]model.Order, error) {
-	db.mu.RLock()
-	defer db.mu.RUnlock()
-
-	result := make([]model.Order, 0, len(db.orders))
-	for _, order := range db.orders {
-		result = append(result, order)
-	}
-
-	return result, nil
-}
+//func (db *OrderStorage) OrdersGet(_ context.Context) ([]model.Order, error) {
+//	db.mu.RLock()
+//	defer db.mu.RUnlock()
+//
+//	result := make([]model.Order, 0, len(db.orders))
+//	for _, order := range db.orders {
+//		result = append(result, order)
+//	}
+//
+//	return result, nil
+//}
 
 func (db *OrderStorage) OrderUpdate(_ context.Context, order model.Order) error {
 	db.mu.Lock()

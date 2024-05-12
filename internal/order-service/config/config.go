@@ -28,6 +28,8 @@ type ServiceConfig struct {
 	PostgresSSLMode           string `env:"POSTGRES_SSL_MODE" envDefault:"disable"`
 	PostgresMaxIdleConnection int    `env:"POSTGRES_MAX_IDLE_CONNECTION" envDefault:"2"`
 	PostgresMaxOpenConnection int    `env:"POSTGRES_MAX_OPEN_CONNECTION" envDefault:"10"`
+
+	// TODO: add the queue connection config
 }
 
 // ParseConfiguration read the environment variables overwriting any defaults set. Any ServiceConfig values

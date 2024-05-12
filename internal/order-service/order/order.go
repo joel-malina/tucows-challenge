@@ -29,14 +29,17 @@ func NewOrderCreate(repo CreateRepository) *OrderCreate {
 
 func (o *OrderCreate) OrderCreate(ctx context.Context, order model.Order) (uuid.UUID, error) {
 
-	order.ID = model.CreateUUID()
+	// Optionally could have made the UUID here instead of assuming we'd get one from the webapp
+	// order.ID = model.CreateUUID()
 
 	err := o.repo.OrderCreate(ctx, order)
 	if err != nil {
 		return uuid.UUID{}, err
 	}
 
+	// TODO: put the created order into the payment process queue
 	// o.onCreate.Emit(ctx, order)
+
 	return order.ID, nil
 }
 
@@ -130,21 +133,21 @@ func (o *OrderGet) OrderGet(ctx context.Context, id uuid.UUID) (model.Order, err
 	return order, err
 }
 
-type OrdersGet struct {
-	repo orderstorage.OrderGetter
-}
+//type OrdersGet struct {
+//	repo orderstorage.OrderGetter
+//}
 
-func NewOrdersGet(repo orderstorage.OrderGetter) *OrdersGet {
-	return &OrdersGet{
-		repo: repo,
-	}
-}
+//func NewOrdersGet(repo orderstorage.OrderGetter) *OrdersGet {
+//	return &OrdersGet{
+//		repo: repo,
+//	}
+//}
 
-func (o OrdersGet) OrdersGet(ctx context.Context) ([]model.Order, error) {
-	orders, err := o.repo.OrdersGet(ctx)
-	if err != nil {
-		return []model.Order{}, err
-	}
-
-	return orders, nil
-}
+//func (o OrdersGet) OrdersGet(ctx context.Context) ([]model.Order, error) {
+//	orders, err := o.repo.OrdersGet(ctx)
+//	if err != nil {
+//		return []model.Order{}, err
+//	}
+//
+//	return orders, nil
+//}

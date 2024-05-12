@@ -27,7 +27,7 @@ func OrderUpdateHandler(svc OrderUpdater) func(*restful.Request, *restful.Respon
 			return
 		}
 
-		//payload.Name = strings.TrimSpace(payload.Name)
+		// TOOD: Likely want to validate the payload based on a set of criteria
 		//if err := payload.Validate(); err != nil {
 		//	response.WriteErrorWithContext("failed to validate request", log, resp, http.StatusBadRequest, err)
 		//	return
@@ -40,7 +40,7 @@ func OrderUpdateHandler(svc OrderUpdater) func(*restful.Request, *restful.Respon
 		}
 		log = log.WithField(model.LogFieldOrderID, orderID)
 
-		order, err := orderParametersToOrder(ctx, payload)
+		order, err := orderParametersToOrder(payload)
 		order.ID = orderID
 		if err != nil {
 			response.WriteErrorWithContext("failed to update order", log, resp, http.StatusInternalServerError, err)
