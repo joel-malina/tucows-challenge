@@ -1,0 +1,33 @@
+<!-- HTML for static distribution bundle build -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tucows Order API</title>
+    <link rel="stylesheet" type="text/css" href="./swagger-ui.css"/>
+    <link rel="stylesheet" type="text/css" href="index.css"/>
+    <link rel="stylesheet" type="text/css" href="./custom.css">
+<!--    <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32"/>-->
+<!--    <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16"/>-->
+</head>
+
+<body>
+<div id='header'>
+    <div class="swagger-ui-wrap">
+        <a id="logo" href="">Tucows Order API</a>
+    </div>
+</div>
+<div id="swagger-ui"></div>
+<footer>
+    <p class="swagger-ui" style="margin-left:20px">Swagger UI version: <span id="version-ui"></span></p>
+</footer>
+<script src="./swagger-ui-bundle.js" charset="UTF-8"></script>
+<script src="./swagger-ui-standalone-preset.js" charset="UTF-8"></script>
+<script src="./swagger-initializer.js" charset="UTF-8"></script>
+<script>
+    window.addEventListener('load', function() {
+        document.getElementById('version-ui').innerHTML=JSON.parse(JSON.stringify(versions.swaggerUi.version))
+    })
+</script>
+</body>
+</html>

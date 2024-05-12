@@ -19,18 +19,33 @@ const (
 )
 
 type Order struct {
-	ID          uuid.UUID
-	CustomerID  uuid.UUID
-	ProductID   uuid.UUID
-	ProductName string
-	Quantity    int
-	Price       float64
-	Status      OrderStatus
-	CreatedAt   time.Time
-	LastUpdate  time.Time
+	ID         uuid.UUID
+	CustomerID uuid.UUID
+	OrderDate  time.Time
+	Status     OrderStatus
+	TotalPrice float64
+	OrderItems []OrderItem
 }
 
-func CreateOrderID() uuid.UUID {
+type OrderItem struct {
+	ID        uuid.UUID
+	OrderID   uuid.UUID
+	ProductID uuid.UUID
+	Quantity  int
+	Price     float64
+}
+
+type Product struct {
+	ID          uuid.UUID
+	Name        string
+	Description string
+	Price       float64
+	Stock       int
+}
+
+// There should also be a customer table to support multiple customers
+
+func CreateUUID() uuid.UUID {
 	uuidv7, err := uuidgen.NewV7()
 	result := uuid.UUID(uuidv7)
 	if err != nil {

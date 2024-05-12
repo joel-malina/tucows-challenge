@@ -1,0 +1,7 @@
+FROM accelbyte/golang-builder:1.21.3-alpine
+
+ENV PATH="${GOPATH}/bin:${PATH}"
+
+RUN apk add yarn git
+
+ENTRYPOINT []

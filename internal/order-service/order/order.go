@@ -29,7 +29,7 @@ func NewOrderCreate(repo CreateRepository) *OrderCreate {
 
 func (o *OrderCreate) OrderCreate(ctx context.Context, order model.Order) (uuid.UUID, error) {
 
-	order.ID = model.CreateOrderID()
+	order.ID = model.CreateUUID()
 
 	err := o.repo.OrderCreate(ctx, order)
 	if err != nil {

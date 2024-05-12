@@ -22,7 +22,7 @@ type ServiceConfig struct {
 
 	PostgresHost              string `env:"POSTGRES_HOST" envDefault:"localhost"`
 	PostgresPort              string `env:"POSTGRES_PORT" envDefault:"5432"`
-	PostgresDB                string `env:"POSTGRES_DB" envDefault:"order-service"`
+	PostgresDB                string `env:"POSTGRES_DB" envDefault:"tucows-challenge"`
 	PostgresUser              string `env:"POSTGRES_USERNAME" envDefault:"postgres"`
 	PostgresPassword          string `env:"POSTGRES_PASSWORD" envDefault:"example"`
 	PostgresSSLMode           string `env:"POSTGRES_SSL_MODE" envDefault:"disable"`

@@ -1,0 +1,55 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    command: postgres -c 'max_connections=200'
+    environment:
+      POSTGRES_DB: tucows-challenge
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-vol:/var/lib/postgresql/data
+    networks:
+      - db
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  atlas-migration:
+    image: postgres:15.1
+    restart: always
+    environment:
+      POSTGRES_DB: atlas-migration-compare
+      POSTGRES_USER: user1
+      POSTGRES_PASSWORD: pw1
+    ports:
+      #  using a non-default port so as not to clash with other services running postgres locally
+      - "5433:5432"
+    networks:
+      - db
+  sandbox_creator:
+    image: accelbyte/pg-sandbox-creator:8ff4a4a6-1698105179
+    depends_on:
+      - postgres
+    volumes:
+      - ./db/migrations/:/migrations
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      SANDBOX_CREATOR_PORT: 8081
+      ATLAS_CMD: "/atlas"
+    ports:
+      - "8081:8081"
+    networks:
+      - db
+networks:
+  db:
+volumes:
+  postgres-vol:
