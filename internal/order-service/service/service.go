@@ -16,14 +16,16 @@ import (
 	"github.com/joel-malina/tucows-challenge/internal/order-service/adapters/handler"
 	"github.com/joel-malina/tucows-challenge/internal/order-service/config"
 	"github.com/joel-malina/tucows-challenge/internal/order-service/order"
+	"github.com/joel-malina/tucows-challenge/internal/order-service/ports/orderqueue"
+	"github.com/joel-malina/tucows-challenge/internal/order-service/ports/orderstorage"
 	"github.com/sirupsen/logrus"
 )
 
-func Run(ctx context.Context, serviceConfig config.ServiceConfig, storageResolver *StorageResolver) {
+func Run(ctx context.Context, serviceConfig config.ServiceConfig, storageResolver *StorageResolver, queueResolver *QueueResolver) {
 
 	log := logrus.New()
 
-	orderHandlerLogic := setupServiceDependencies(ctx, log, serviceConfig, storageResolver)
+	orderHandlerLogic := setupServiceDependencies(ctx, log, serviceConfig, storageResolver, queueResolver)
 
 	container := setupWebServiceContainer(serviceConfig, orderHandlerLogic)
 
@@ -35,7 +37,7 @@ func Run(ctx context.Context, serviceConfig config.ServiceConfig, storageResolve
 
 	for _, webService := range container.RegisteredWebServices() {
 		for _, route := range webService.Routes() {
-			log.Printf("%s %s", route.Method, route.Path)
+			log.Infof("%s %s", route.Method, route.Path)
 		}
 	}
 
@@ -78,15 +80,26 @@ type orderHandlers struct {
 	handler.OrderDeleter
 }
 
-func setupServiceDependencies(_ context.Context, log *logrus.Logger, serviceConfig config.ServiceConfig, storage *StorageResolver) orderHandlers {
+func setupServiceDependencies(_ context.Context, log *logrus.Logger, serviceConfig config.ServiceConfig, storage *StorageResolver, queue *QueueResolver) orderHandlers {
 
 	// setup auth here if it were a public API
 	storage.Resolve(log, serviceConfig)
 	orderRepo := storage.OrderRepository
 
+	queue.Resolve(log, serviceConfig)
+	orderQueue := queue.OrderQueue
+
+	orderCreator := order.NewOrderCreate(struct {
+		orderstorage.OrderCreator
+		orderqueue.OrderEnqueuer
+	}{
+		OrderCreator:  orderRepo,
+		OrderEnqueuer: orderQueue,
+	})
+
 	// OrdersGetter: order.NewOrdersGet(orderRepo),
 	orderHandlerLogic := orderHandlers{
-		OrderCreator: order.NewOrderCreate(orderRepo),
+		OrderCreator: orderCreator,
 		OrderGetter:  order.NewOrderGet(orderRepo),
 		OrderUpdater: order.NewOrderUpdate(orderRepo),
 		OrderDeleter: order.NewOrderDelete(orderRepo),

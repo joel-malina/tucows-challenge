@@ -30,5 +30,5 @@ func main() {
 		cancel()
 	}()
 
-	service.Run(ctx, cfg, &service.StorageResolver{})
+	service.Run(ctx, cfg, &service.StorageResolver{}, &service.QueueResolver{})
 }

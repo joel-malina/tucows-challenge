@@ -57,10 +57,12 @@ services:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
     ports:
-      - "5672:5672"    # Default RabbitMQ port
+      - "5672:5672"
       - "15672:15672"  # Management interface
     volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
+    - rabbitmq-data:/var/lib/rabbitmq
+    - ./init-queues.sh:/opt/init-queues.sh
+    command: ["bash", "-c", "/opt/init-queues.sh & rabbitmq-server"]
     networks:
       - db
     restart: always

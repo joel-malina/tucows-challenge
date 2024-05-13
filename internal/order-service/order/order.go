@@ -5,40 +5,39 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/joel-malina/tucows-challenge/internal/order-service/model"
+	"github.com/joel-malina/tucows-challenge/internal/order-service/ports/orderqueue"
 	"github.com/joel-malina/tucows-challenge/internal/order-service/ports/orderstorage"
 )
 
-type CreateRepository interface {
+type OrderCreateAdapter interface {
 	orderstorage.OrderCreator
+	orderqueue.OrderEnqueuer
 }
 
 type OrderCreate struct {
-	repo CreateRepository
-	// onCreate event.Emitter[model.Order] add to queue
+	adpt OrderCreateAdapter
 }
 
-func NewOrderCreate(repo CreateRepository) *OrderCreate {
+func NewOrderCreate(adpt OrderCreateAdapter) *OrderCreate {
 	return &OrderCreate{
-		repo: repo,
+		adpt: adpt,
 	}
 }
-
-//func (fc *OrderCreate) OrderCreateSubscribe(subscription chan<- event.DataWithContext[model.Order]) {
-//	fc.onCreate.Subscribe(subscription)
-//}
 
 func (o *OrderCreate) OrderCreate(ctx context.Context, order model.Order) (uuid.UUID, error) {
 
 	// Optionally could have made the UUID here instead of assuming we'd get one from the webapp
 	// order.ID = model.CreateUUID()
 
-	err := o.repo.OrderCreate(ctx, order)
+	err := o.adpt.OrderCreate(ctx, order)
 	if err != nil {
 		return uuid.UUID{}, err
 	}
 
-	// TODO: put the created order into the payment process queue
-	// o.onCreate.Emit(ctx, order)
+	err = o.adpt.OrderEnqueue(ctx, order)
+	if err != nil {
+		return uuid.UUID{}, err
+	}
 
 	return order.ID, nil
 }
@@ -50,7 +49,6 @@ type UpdateRepository interface {
 
 type OrderUpdate struct {
 	repo UpdateRepository
-	// onUpdate event.Emitter[model.Order]
 }
 
 func NewOrderUpdate(repo UpdateRepository) *OrderUpdate {
@@ -58,10 +56,6 @@ func NewOrderUpdate(repo UpdateRepository) *OrderUpdate {
 		repo: repo,
 	}
 }
-
-//func (o *OrderUpdate) OrderUpdateSubscribe(subscription chan<- event.DataWithContext[model.Order]) {
-//	o.onUpdate.Subscribe(subscription)
-//}
 
 func (o *OrderUpdate) OrderUpdate(ctx context.Context, updateParameters model.Order) error {
 	_, err := o.repo.OrderGet(ctx, updateParameters.ID)
@@ -74,7 +68,6 @@ func (o *OrderUpdate) OrderUpdate(ctx context.Context, updateParameters model.Or
 		return err
 	}
 
-	//o.onUpdate.Emit(ctx, updateParameters)
 	return nil
 }
 
@@ -94,10 +87,6 @@ func NewOrderDelete(repo OrderDeleteRepository) *OrderDelete {
 	}
 }
 
-//func (o *OrderDelete) OrderDeleteSubscribe(subscription chan<- event.DataWithContext[model.OrderDeleteEvent]) {
-//	f.onDelete.Subscribe(subscription)
-//}
-
 func (o *OrderDelete) OrderDelete(ctx context.Context, id uuid.UUID) error {
 	_, err := o.repo.OrderGet(ctx, id)
 	if err != nil {
@@ -106,8 +95,6 @@ func (o *OrderDelete) OrderDelete(ctx context.Context, id uuid.UUID) error {
 
 	err = o.repo.OrderDelete(ctx, id)
 	if err == nil {
-		//deleteEvent := model.OrderDeleteEvent{OrderID: id}
-		//o.onDelete.Emit(ctx, deleteEvent)
 		return nil
 	}
 
@@ -133,21 +120,21 @@ func (o *OrderGet) OrderGet(ctx context.Context, id uuid.UUID) (model.Order, err
 	return order, err
 }
 
-//type OrdersGet struct {
-//	repo orderstorage.OrderGetter
+//type OrderSubmit struct {
+//	queue orderqueue.OrderEnqueuer
 //}
-
-//func NewOrdersGet(repo orderstorage.OrderGetter) *OrdersGet {
-//	return &OrdersGet{
-//		repo: repo,
+//
+//func NewOrderSubmit(queue orderqueue.OrderEnqueuer) *OrderSubmit {
+//	return &OrderSubmit{
+//		queue: queue,
 //	}
 //}
-
-//func (o OrdersGet) OrdersGet(ctx context.Context) ([]model.Order, error) {
-//	orders, err := o.repo.OrdersGet(ctx)
+//
+//func (o *OrderSubmit) OrderSubmit(ctx context.Context, order model.Order) error {
+//	err := o.queue.OrderEnqueue(ctx, order)
 //	if err != nil {
-//		return []model.Order{}, err
+//		return model.ErrOrderSubmit
 //	}
 //
-//	return orders, nil
+//	return nil
 //}

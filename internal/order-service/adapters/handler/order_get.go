@@ -32,7 +32,7 @@ func OrderGetHandler(svc OrderGetter) func(*restful.Request, *restful.Response) 
 		order, err := svc.OrderGet(ctx, orderID)
 		if err != nil {
 			if errors.Is(err, model.ErrOrderNotFound) {
-				response.WriteErrorWithContext("failed to get order", log, resp, http.StatusNotFound, err)
+				response.WriteErrorWithContext("failed to find order", log, resp, http.StatusNotFound, err)
 				return
 			}
 

@@ -2,6 +2,7 @@ package sqlstorage
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -46,7 +47,7 @@ INSERT INTO orders (order_id, customer_id, order_date, status, total_price) VALU
 	// iterate over the list and add the OrderItems to the 'order_items' table
 	for i := range order.OrderItems {
 		_, err = f.db.NamedExecContext(ctx, `
-INSERT INTO order_items (item_id, order_id, product_id, quantity, price) VALUES (:order_id, :item_id, :product_id, :quantity, :price)
+INSERT INTO order_items (item_id, order_id, product_id, quantity, price) VALUES (:item_id, :order_id, :product_id, :quantity, :price)
 `, orderItemRecordFromModel(order.OrderItems[i]))
 		if err != nil {
 			return err
@@ -58,7 +59,7 @@ INSERT INTO order_items (item_id, order_id, product_id, quantity, price) VALUES 
 
 // OrderDelete does a soft delete. The deletion can be done at a later time when the db isn't busy or the record can be recovered
 func (f OrderRepository) OrderDelete(ctx context.Context, id uuid.UUID) error {
-	result, err := f.db.ExecContext(ctx, "UPDATE orders SET deleted_at=CURRENT_TIMESTAMP AT TIME ZONE 'UTC' WHERE order_id=$1", id)
+	result, err := f.db.ExecContext(ctx, `UPDATE orders SET deleted_at=CURRENT_TIMESTAMP AT TIME ZONE 'UTC' WHERE order_id=$1`, id)
 	if err != nil {
 		return err
 	}
@@ -107,15 +108,16 @@ UPDATE order_items SET product_id=:product_id, quantity=:quantity, price=:price 
 
 func (f OrderRepository) OrderGet(ctx context.Context, id uuid.UUID) (model.Order, error) {
 	var order orderRecord
-	err := f.db.GetContext(ctx, &order, "SELECT order_id, customer_id, order_date, status, total_price FROM orders WHERE order_id=$1 AND deleted_at IS NULL", id.String())
+	err := f.db.GetContext(ctx, &order, `SELECT order_id, customer_id, order_date, status, total_price FROM orders WHERE order_id=$1`, id.String())
 	if err != nil {
 		return model.Order{}, err
 	}
 
 	// also get each item from order_items that has the same order_id
 	var orderItems []orderItemRecord
-	err = f.db.GetContext(ctx, &orderItems, "SELECT item_id, order_id, product_id, quantity, price FROM orders_items WHERE order_id=$1 AND deleted_at IS NULL", id.String())
+	err = f.db.SelectContext(ctx, &orderItems, `SELECT item_id, order_id, product_id, quantity, price FROM order_items WHERE order_id=$1`, id.String())
 	if err != nil {
+		fmt.Println(id.String())
 		return model.Order{}, err
 	}
 
@@ -124,7 +126,7 @@ func (f OrderRepository) OrderGet(ctx context.Context, id uuid.UUID) (model.Orde
 
 //func (f OrderRepository) OrdersGet(ctx context.Context) ([]model.Order, error) {
 //	var orderRecords []orderRecord
-//	err := f.db.SelectContext(ctx, &orderRecords, "SELECT id, product_name, quantity, price, status, created_at, created_at, last_update, deleted_at FROM orders WHERE deleted_at IS NULL")
+//	err := f.db.SelectContext(ctx, &orderRecords, `SELECT id, product_name, quantity, price, status, created_at, created_at, last_update, deleted_at FROM orders WHERE deleted_at IS NULL")
 //	if err != nil {
 //		return nil, err
 //	}

@@ -18,7 +18,7 @@ type ServiceConfig struct {
 	LogLevel  string `env:"LOG_LEVEL" envDefault:"info" envDocs:"Determines what log level to output"`
 	LogFormat string `env:"LOG_FORMAT" envDefault:"text" envDocs:"Determines what log format to output"`
 
-	EnablePersistentStorage bool `env:"ENABLE_PERSISTENT_STORAGE" envDefault:"false" envDocs:"Use the postgres backed persistent storage for server record storage (vs in memory)"`
+	EnablePersistentStorage bool `env:"ENABLE_PERSISTENT_STORAGE" envDefault:"true" envDocs:"Use the postgres backed persistent storage for server record storage (vs in memory)"`
 
 	PostgresHost              string `env:"POSTGRES_HOST" envDefault:"localhost"`
 	PostgresPort              string `env:"POSTGRES_PORT" envDefault:"5432"`
@@ -29,7 +29,10 @@ type ServiceConfig struct {
 	PostgresMaxIdleConnection int    `env:"POSTGRES_MAX_IDLE_CONNECTION" envDefault:"2"`
 	PostgresMaxOpenConnection int    `env:"POSTGRES_MAX_OPEN_CONNECTION" envDefault:"10"`
 
-	// TODO: add the queue connection config
+	RabbitMQUser     string `env:"RABBITMQ_USER" envDefault:"user"`
+	RabbitMQPassword string `env:"RABBITMQ_PASSWORD" envDefault:"password"`
+	RabbitMQHost     string `env:"RABBITMQ_HOST" envDefault:"localhost"`
+	RabbitMQPort     string `env:"RABBITMQ_PORT" envDefault:"5672"`
 }
 
 // ParseConfiguration read the environment variables overwriting any defaults set. Any ServiceConfig values

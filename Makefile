@@ -40,6 +40,7 @@ dev:
 cleandev:
 	docker-compose down
 	-docker volume remove tucows-challenge_postgres-vol
+	-docker volume remove tucows-challenge_rabbitmq-data
 	docker-compose up -d
 	sleep 2
 	db/apply_local.sh
