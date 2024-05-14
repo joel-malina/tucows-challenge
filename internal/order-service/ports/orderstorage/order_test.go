@@ -76,7 +76,7 @@ func orderRepositories(t *testing.T) []porttester.PortTester[orderstorage.OrderR
 	return repositories
 }
 
-func TestOrderCreate_specify_ID(t *testing.T) {
+func TestOrderCreate_success(t *testing.T) {
 	t.Parallel()
 
 	for _, repositoryTest := range orderRepositories(t) {

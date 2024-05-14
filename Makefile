@@ -58,7 +58,9 @@ clean-order:
 clean: clean-order clean-payment
 
 test:
-	echo "not running tests"
+	docker build -t order-service-builder -f Dockerfile.build .
+	@echo "Running tests..."
+	docker run --rm -v $(CURDIR):/app -w /app $(ORDER_BUILDER_IMAGE) go test ./...
 
 dev:
 	docker-compose up

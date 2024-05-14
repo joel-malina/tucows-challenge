@@ -52,11 +52,11 @@ func TestGetOrder_invalid_ID(t *testing.T) {
 func TestGetOrder_success(t *testing.T) {
 	tc := ts.SetupRoutesTest(t)
 	orderID := model.CreateUUID()
-
+	customerID := model.CreateUUID()
 	getStub := orderGetStub{
 		resultTemplate: model.Order{
 			ID:         orderID,
-			CustomerID: model.CreateUUID(),
+			CustomerID: customerID,
 			OrderDate:  time.Now().UTC(),
 			Status:     model.OrderStatusPaymentProcessRequested,
 			TotalPrice: 1111,
@@ -85,7 +85,17 @@ func TestGetOrder_success(t *testing.T) {
 	tc.Expect(err).ToNot(HaveOccurred())
 	tc.Expect(resp.Code).To(Equal(http.StatusOK))
 	tc.Expect(response).To(Equal(api.OrderGetResponse{
-		ID: orderID.String(),
+		ID:         orderID.String(),
+		CustomerID: customerID.String(),
+		OrderItems: []api.OrderItem{
+			api.OrderItem{
+				ID:        uuid.UUID{}.String(),
+				OrderID:   orderID.String(),
+				ProductID: uuid.UUID{}.String(),
+				Quantity:  1,
+				Price:     1111,
+			},
+		},
 	}))
 }
 
