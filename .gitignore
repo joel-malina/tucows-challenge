@@ -22,3 +22,9 @@ go.work
 
 /bin/
 /.env
+
+/order
+/order.sha256
+
+/payment
+./payment.sha256

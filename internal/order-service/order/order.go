@@ -119,22 +119,3 @@ func (o *OrderGet) OrderGet(ctx context.Context, id uuid.UUID) (model.Order, err
 
 	return order, err
 }
-
-//type OrderSubmit struct {
-//	queue orderqueue.OrderEnqueuer
-//}
-//
-//func NewOrderSubmit(queue orderqueue.OrderEnqueuer) *OrderSubmit {
-//	return &OrderSubmit{
-//		queue: queue,
-//	}
-//}
-//
-//func (o *OrderSubmit) OrderSubmit(ctx context.Context, order model.Order) error {
-//	err := o.queue.OrderEnqueue(ctx, order)
-//	if err != nil {
-//		return model.ErrOrderSubmit
-//	}
-//
-//	return nil
-//}

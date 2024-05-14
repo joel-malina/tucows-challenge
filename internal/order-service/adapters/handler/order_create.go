@@ -29,7 +29,7 @@ func OrderCreateHandler(svc OrderCreator) func(*restful.Request, *restful.Respon
 			return
 		}
 
-		// TOOD: Likely want to validate the payload based on a set of criteria
+		// Likely want to validate the payload based on a set of criteria
 		//if err := payload.Validate(); err != nil {
 		//	response.WriteErrorWithContext("failed to validate request", log, resp, http.StatusBadRequest, err)
 		//	return
@@ -37,13 +37,13 @@ func OrderCreateHandler(svc OrderCreator) func(*restful.Request, *restful.Respon
 
 		order, err := orderParametersToOrder(payload)
 		if err != nil {
-			response.WriteErrorWithContext("failed to create order", log, resp, http.StatusInternalServerError, err)
+			response.WriteErrorWithContext("failed to create order", log, resp, http.StatusBadRequest, err)
 			return
 		}
 
 		id, err := svc.OrderCreate(ctx, order)
 		if err != nil {
-			// TODO: Could handle specific errors more gracefully
+			// Could handle specific errors more gracefully
 			//if err == model.ErrOrderLimitViolation {
 			//	response.WriteErrorWithContext("failed to create order", log, resp, http.StatusForbidden, err)
 			//	return

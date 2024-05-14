@@ -10,7 +10,6 @@ type ServiceConfig struct {
 	ServiceGitHash   string
 	ServiceBuildDate string
 
-	//ClusterBaseURL url.URL `env:"CLUSTER_BASE_URL" envDefault:"http://localhost:8080" envDocs:"The base url for the cluster running the service"`
 	BasePath    string `env:"BASE_PATH" envDefault:"/order-service" envDocs:"The base path for the REST api"`
 	ServiceName string `env:"SERVICE_NAME" envDefault:"order-service" envDocs:"The name of the service"`
 	Port        int    `env:"PORT" envDefault:"8080" envDocs:"The port which the service will listen to"`

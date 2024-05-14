@@ -1,7 +1,5 @@
 package api
 
-// TODO: fill in order parameters
-
 type OrderParameters struct {
 	OrderID    string      `json:"orderId"`
 	CustomerID string      `json:"customerId"`
@@ -21,10 +19,7 @@ type OrderCreateResponse struct {
 }
 
 type OrderGetResponse struct {
-	ID string `json:"id"`
-	//Name                   string                       `json:"name"`
-}
-
-type OrdersGetResponse struct {
-	Orders []OrderGetResponse `json:"orders"`
+	ID         string      `json:"id"`
+	CustomerID string      `json:"customerId"`
+	OrderItems []OrderItem `json:"orderItems"`
 }

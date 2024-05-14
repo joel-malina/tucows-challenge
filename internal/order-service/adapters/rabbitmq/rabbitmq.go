@@ -7,6 +7,7 @@ import (
 
 	"github.com/joel-malina/tucows-challenge/internal/order-service/model"
 	ampq "github.com/rabbitmq/amqp091-go"
+	"github.com/sirupsen/logrus"
 )
 
 type OrderQueue struct {
@@ -18,8 +19,6 @@ func NewOrderQueue(mq *ampq.Channel) OrderQueue {
 		mq: mq,
 	}
 }
-
-// TODO: implement enqueue on payment_request and dequeue on payment_response
 
 func (o OrderQueue) OrderEnqueue(ctx context.Context, order model.Order) error {
 	body, err := json.Marshal(order)
@@ -41,7 +40,39 @@ func (o OrderQueue) OrderEnqueue(ctx context.Context, order model.Order) error {
 		log.Fatalf("Failed to publish a message: %v", err)
 	}
 
-	log.Printf(" [x] Sent %s", body)
+	log.Printf(" [>>>] payment requested %s", body)
 
 	return nil
+}
+
+func (o OrderQueue) OrderPaymentListener(log *logrus.Logger) {
+	msgs, err := o.mq.Consume(
+		"payment_response", // queue
+		"",                 // consumer
+		true,               // auto-ack
+		false,              // exclusive
+		false,              // no-local
+		false,              // no-wait
+		nil,                // args
+	)
+	if err != nil {
+		log.Fatalf("Failed to register a consumer: %v", err)
+	}
+
+	forever := make(chan bool)
+
+	go func() {
+		for d := range msgs {
+			var order model.Order
+			if err := json.Unmarshal(d.Body, &order); err != nil {
+				log.Printf("Error decoding JSON: %s", err)
+				continue
+			}
+			log.Printf(" [<<<] payment processed for order: %+v", order)
+			// TODO: update db with new status
+		}
+	}()
+
+	log.Printf("Waiting for messages on payment response queue...")
+	<-forever
 }

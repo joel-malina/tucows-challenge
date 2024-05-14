@@ -1,0 +1,3 @@
+INSERT INTO products (product_id, name, description, price, stock) VALUES
+                                                                       ('550e8400-e29b-41d4-a716-446655440000', 'Pink Cow', 'Produces the finest of strawberry dairy products!', 111, 11),
+                                                                       ('550e8400-e29b-41d4-a716-446655440001', 'Blue Cow', 'Produces blue dairy products -- yum!', 222, 22);

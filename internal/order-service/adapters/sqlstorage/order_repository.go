@@ -59,7 +59,7 @@ INSERT INTO order_items (item_id, order_id, product_id, quantity, price) VALUES 
 
 // OrderDelete does a soft delete. The deletion can be done at a later time when the db isn't busy or the record can be recovered
 func (f OrderRepository) OrderDelete(ctx context.Context, id uuid.UUID) error {
-	result, err := f.db.ExecContext(ctx, `UPDATE orders SET deleted_at=CURRENT_TIMESTAMP AT TIME ZONE 'UTC' WHERE order_id=$1`, id)
+	result, err := f.db.ExecContext(ctx, `DELETE FROM orders WHERE order_id=$1`, id)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ UPDATE orders SET customer_id=:customer_id, order_date=:order_date, status=:stat
 	}
 
 	for i := range order.OrderItems {
-		result, err = f.db.NamedExecContext(ctx, `
+		_, err = f.db.NamedExecContext(ctx, `
 UPDATE order_items SET product_id=:product_id, quantity=:quantity, price=:price WHERE item_id=:item_id AND order_id=:order_id
 `, orderItemRecordFromModel(order.OrderItems[i]))
 		if err != nil {
@@ -123,18 +123,6 @@ func (f OrderRepository) OrderGet(ctx context.Context, id uuid.UUID) (model.Orde
 
 	return orderModelFromRecord(order, orderItems), nil
 }
-
-//func (f OrderRepository) OrdersGet(ctx context.Context) ([]model.Order, error) {
-//	var orderRecords []orderRecord
-//	err := f.db.SelectContext(ctx, &orderRecords, `SELECT id, product_name, quantity, price, status, created_at, created_at, last_update, deleted_at FROM orders WHERE deleted_at IS NULL")
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	orders := pie.Map(orderRecords, orderModelFromRecord)
-//
-//	return orders, err
-//}
 
 func orderModelFromRecord(dbOrder orderRecord, dbOrderItems []orderItemRecord) model.Order {
 

@@ -1,7 +1,7 @@
-FROM accelbyte/golang-builder:1.21.3-alpine
+FROM golang:1.22-alpine
 
 ENV PATH="${GOPATH}/bin:${PATH}"
 
-RUN apk add yarn git
+RUN apk add yarn git bash gcc musl-dev rhash
 
 ENTRYPOINT []

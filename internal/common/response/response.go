@@ -11,7 +11,8 @@ import (
 )
 
 type ErrorResponse struct {
-	// TraceID      string `json:"traceId"` could put tracing in this too
+	// could put tracing in this too
+	// TraceID      string `json:"traceId"`
 	ErrorMessage string `json:"errorMessage"`
 	ErrorType    string `json:"errorType"`
 }

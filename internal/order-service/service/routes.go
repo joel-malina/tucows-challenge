@@ -47,19 +47,6 @@ func MakeOrderGetRoute(service *restful.WebService, getter handler.OrderGetter) 
 		Produces(restful.MIME_JSON))
 }
 
-//func MakeOrderGetAllRoute(service *restful.WebService, getter handler.OrdersGetter) *restful.WebService {
-//	return service.Route(service.GET("/orders").
-//		To(handler.OrdersGetHandler(getter)).
-//		Filter(handler.ValidatePathParameter).
-//		Metadata(restfulspec.KeyOpenAPITags, orderServiceAPITag).
-//		Doc("get all orders").
-//		Operation("OrdersGet").
-//		Returns(http.StatusOK, "success", api.OrdersGetResponse{}).
-//		Returns(http.StatusInternalServerError, "internal server error", response.ErrorResponse{}).
-//		Consumes(restful.MIME_JSON).
-//		Produces(restful.MIME_JSON))
-//}
-
 func MakeOrderUpdateRoute(service *restful.WebService, updater handler.OrderUpdater) *restful.WebService {
 	return service.Route(service.PUT(fmt.Sprintf("/orders/{%s}", handler.PathParamOrderID)).
 		Param(service.PathParameter(handler.PathParamOrderID, "the id of the order").

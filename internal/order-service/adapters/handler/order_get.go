@@ -44,9 +44,23 @@ func OrderGetHandler(svc OrderGetter) func(*restful.Request, *restful.Response) 
 	}
 }
 
-// TODO: fill in response once model it is updated
 func toOrderGetResponse(order model.Order) api.OrderGetResponse {
+
+	var apiOrderItems []api.OrderItem
+	for i := range order.OrderItems {
+		item := api.OrderItem{
+			ID:        order.OrderItems[i].ID.String(),
+			OrderID:   order.OrderItems[i].OrderID.String(),
+			ProductID: order.OrderItems[i].ProductID.String(),
+			Quantity:  order.OrderItems[i].Quantity,
+			Price:     order.OrderItems[i].Price,
+		}
+		apiOrderItems = append(apiOrderItems, item)
+	}
+
 	return api.OrderGetResponse{
-		ID: order.ID.String(),
+		ID:         order.ID.String(),
+		CustomerID: order.CustomerID.String(),
+		OrderItems: apiOrderItems,
 	}
 }

@@ -72,7 +72,6 @@ func Run(ctx context.Context, serviceConfig config.ServiceConfig, storageResolve
 	log.Println("exiting")
 }
 
-// handler.OrdersGetter
 type orderHandlers struct {
 	handler.OrderCreator
 	handler.OrderGetter
@@ -97,7 +96,6 @@ func setupServiceDependencies(_ context.Context, log *logrus.Logger, serviceConf
 		OrderEnqueuer: orderQueue,
 	})
 
-	// OrdersGetter: order.NewOrdersGet(orderRepo),
 	orderHandlerLogic := orderHandlers{
 		OrderCreator: orderCreator,
 		OrderGetter:  order.NewOrderGet(orderRepo),
@@ -163,7 +161,6 @@ func setupV1Routes(container *restful.Container, serviceConfig config.ServiceCon
 	// would add auth filter to these, possibly namespace them too
 	MakeOrderCreateRoute(v1RootRoutes, orderHandlers)
 	MakeOrderGetRoute(v1RootRoutes, orderHandlers)
-	//MakeOrderGetAllRoute(v1RootRoutes, orderHandlers)
 	MakeOrderUpdateRoute(v1RootRoutes, orderHandlers)
 	MakeOrderDeleteRoute(v1RootRoutes, orderHandlers)
 

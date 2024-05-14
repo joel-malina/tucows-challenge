@@ -18,5 +18,8 @@ func (q *QueueResolver) Resolve(log *logrus.Logger, serviceConfig config.Service
 	q.once.Do(func() {
 		mq := connectToRabbitMQ(log, serviceConfig)
 		q.OrderQueue = rabbitmq.NewOrderQueue(mq)
+
+		// start order payment listener
+		go q.OrderQueue.OrderPaymentListener(log)
 	})
 }
